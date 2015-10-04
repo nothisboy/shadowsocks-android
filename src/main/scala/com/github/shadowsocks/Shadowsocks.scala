@@ -175,11 +175,12 @@ object Shadowsocks {
 class Shadowsocks
   extends PreferenceActivity
   with CompoundButton.OnCheckedChangeListener
-  with MenuAdapter.MenuListener {
+//  with MenuAdapter.MenuListener
+{
 
   // Flags
   val MSG_CRASH_RECOVER: Int = 1
-  val STATE_MENUDRAWER = "com.github.shadowsocks.menuDrawer"
+//  val STATE_MENUDRAWER = "com.github.shadowsocks.menuDrawer"
   val STATE_ACTIVE_VIEW_ID = "com.github.shadowsocks.activeViewId"
   var singlePane: Int = -1
 
@@ -241,7 +242,7 @@ class Shadowsocks
   private lazy val settings = PreferenceManager.getDefaultSharedPreferences(this)
   private lazy val status = getSharedPreferences(Key.status, Context.MODE_PRIVATE)
   private lazy val preferenceReceiver = new PreferenceBroadcastReceiver
-  private lazy val drawer = MenuDrawer.attach(this)
+//  private lazy val drawer = MenuDrawer.attach(this)
   private lazy val menuAdapter = new MenuAdapter(this, getMenuList)
   private lazy val listView = new ListView(this)
   private lazy val profileManager =
@@ -449,30 +450,30 @@ class Shadowsocks
     }
   }
 
-  def initAdView() {
-    if (settings.getString(Key.proxy, "") == "198.199.101.152") {
-      val layoutView = {
-        if (Build.VERSION.SDK_INT > 10) {
-          drawer.getContentContainer.getChildAt(0)
-        } else {
-          getLayoutView(drawer.getContentContainer.getParent)
-        }
-      }
-      if (layoutView != null) {
-        val adView = new AdView(this)
-        adView.setAdUnitId("ca-app-pub-9097031975646651/7760346322")
-        adView.setAdSize(AdSize.SMART_BANNER)
-        layoutView.asInstanceOf[ViewGroup].addView(adView, 0)
-        adView.loadAd(new AdRequest.Builder().build())
-      }
-    }
-  }
+//  def initAdView() {
+//    if (settings.getString(Key.proxy, "") == "198.199.101.152") {
+//      val layoutView = {
+//        if (Build.VERSION.SDK_INT > 10) {
+//          drawer.getContentContainer.getChildAt(0)
+//        } else {
+//          getLayoutView(drawer.getContentContainer.getParent)
+//        }
+//      }
+//      if (layoutView != null) {
+//        val adView = new AdView(this)
+//        adView.setAdUnitId("ca-app-pub-9097031975646651/7760346322")
+//        adView.setAdSize(AdSize.SMART_BANNER)
+//        layoutView.asInstanceOf[ViewGroup].addView(adView, 0)
+//        adView.loadAd(new AdRequest.Builder().build())
+//      }
+//    }
+//  }
 
-  override def setContentView(layoutResId: Int) {
-    drawer.setContentView(layoutResId)
-    initAdView()
-    onContentChanged()
-  }
+//  override def setContentView(layoutResId: Int) {
+//    drawer.setContentView(layoutResId)
+//    initAdView()
+//    onContentChanged()
+//  }
 
   override def onCreate(savedInstanceState: Bundle) {
 
@@ -493,23 +494,23 @@ class Shadowsocks
     }
 
     // Initialize drawer
-    menuAdapter.setActiveId(settings.getInt(Key.profileId, -1))
-    menuAdapter.setListener(this)
+//    menuAdapter.setActiveId(settings.getInt(Key.profileId, -1))
+//    menuAdapter.setListener(this)
     listView.setAdapter(menuAdapter)
-    drawer.setMenuView(listView)
-
-    if (Utils.isLollipopOrAbove) {
-      drawer.setDrawerIndicatorEnabled(false)
-    } else {
-      // The drawable that replaces the up indicator in the action bar
-      drawer.setSlideDrawable(R.drawable.ic_drawer)
-      // Whether the previous drawable should be shown
-      drawer.setDrawerIndicatorEnabled(true)
-    }
-
-    if (!isSinglePane) {
-      drawer.openMenu(false)
-    }
+//    drawer.setMenuView(listView)
+//
+//    if (Utils.isLollipopOrAbove) {
+//      drawer.setDrawerIndicatorEnabled(false)
+//    } else {
+//       The drawable that replaces the up indicator in the action bar
+//      drawer.setSlideDrawable(R.drawable.ic_drawer)
+//       Whether the previous drawable should be shown
+//      drawer.setDrawerIndicatorEnabled(true)
+//    }
+//
+//    if (!isSinglePane) {
+//      drawer.openMenu(false)
+//    }
 
     // Initialize action bar
     val switchLayout = getLayoutInflater
@@ -587,27 +588,27 @@ class Shadowsocks
 
   override def onRestoreInstanceState(inState: Bundle) {
     super.onRestoreInstanceState(inState)
-    drawer.restoreState(inState.getParcelable(STATE_MENUDRAWER))
+//    drawer.restoreState(inState.getParcelable(STATE_MENUDRAWER))
   }
 
   override def onSaveInstanceState(outState: Bundle) {
     super.onSaveInstanceState(outState)
-    outState.putParcelable(STATE_MENUDRAWER, drawer.saveState())
+//    outState.putParcelable(STATE_MENUDRAWER, drawer.saveState())
     outState.putInt(STATE_ACTIVE_VIEW_ID, currentProfile.id)
   }
 
   override def onBackPressed() {
-    val drawerState = drawer.getDrawerState
-    if (drawerState == MenuDrawer.STATE_OPEN || drawerState == MenuDrawer.STATE_OPENING) {
-      drawer.closeMenu()
-      return
-    }
+//    val drawerState = drawer.getDrawerState
+//    if (drawerState == MenuDrawer.STATE_OPEN || drawerState == MenuDrawer.STATE_OPENING) {
+//      drawer.closeMenu()
+//      return
+//    }
     super.onBackPressed()
   }
 
-  override def onActiveViewChanged(v: View, pos: Int) {
-    drawer.setActiveView(v, pos)
-  }
+//  override def onActiveViewChanged(v: View, pos: Int) {
+//    drawer.setActiveView(v, pos)
+//  }
 
   def newProfile(id: Int) {
 
@@ -641,7 +642,7 @@ class Shadowsocks
   }
 
   def reloadProfile() {
-    drawer.closeMenu(true)
+//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -660,7 +661,7 @@ class Shadowsocks
   }
 
   def addProfile(profile: Profile) {
-    drawer.closeMenu(true)
+//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -679,7 +680,7 @@ class Shadowsocks
   }
 
   def addProfile(id: Int) {
-    drawer.closeMenu(true)
+//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -697,7 +698,7 @@ class Shadowsocks
   }
 
   def updateProfile(id: Int) {
-    drawer.closeMenu(true)
+//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -715,7 +716,7 @@ class Shadowsocks
   }
 
   def delProfile(id: Int): Boolean = {
-    drawer.closeMenu(true)
+//    drawer.closeMenu(true)
 
     val profile = profileManager.getProfile(id)
 
@@ -819,7 +820,7 @@ class Shadowsocks
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
     item.getItemId match {
       case android.R.id.home =>
-        drawer.toggleMenu()
+//        drawer.toggleMenu()
         return true
     }
     super.onOptionsItemSelected(item)
@@ -1143,5 +1144,4 @@ class Shadowsocks
       menuAdapter.updateList(getMenuList, currentProfile.id)
     }
   }
-
 }
