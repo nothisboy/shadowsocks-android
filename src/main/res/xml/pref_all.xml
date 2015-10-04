@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory
+    <!--<PreferenceCategory
             android:title="@string/proxy_cat">
 
         <com.github.shadowsocks.preferences.ProfileEditTextPreference
@@ -90,6 +90,6 @@
                 android:title="@string/auto_connect">
         </CheckBoxPreference>
 
-    </PreferenceCategory>
+    </PreferenceCategory>-->
 
 </PreferenceScreen>
