@@ -38,8 +38,7 @@
  */
 package com.github.shadowsocks
 
-import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileOutputStream, IOException, InputStream, OutputStream}
-import java.util
+import java.io.{FileOutputStream, IOException, InputStream, OutputStream}
 import java.util.Locale
 
 import android.app.backup.BackupManager
@@ -47,14 +46,11 @@ import android.app.{Activity, AlertDialog, ProgressDialog}
 import android.content._
 import android.content.pm.{PackageInfo, PackageManager}
 import android.content.res.AssetManager
-import android.graphics.{Bitmap, Color, Typeface}
-import android.net.{Uri, VpnService}
+import android.net.VpnService
 import android.os._
 import android.preference._
 import android.util.{DisplayMetrics, Log}
-import android.view.View.OnLongClickListener
 import android.view._
-import android.webkit.{WebView, WebViewClient}
 import android.widget._
 import com.github.mrengineer13.snackbar._
 import com.github.shadowsocks.aidl.{IShadowsocksService, IShadowsocksServiceCallback}
@@ -62,53 +58,9 @@ import com.github.shadowsocks.database._
 import com.github.shadowsocks.preferences.{PasswordEditTextPreference, ProfileEditTextPreference, SummaryEditTextPreference}
 import com.github.shadowsocks.utils._
 import com.google.zxing.integration.android.IntentIntegrator
-import com.nostra13.universalimageloader.core.download.BaseImageDownloader
-import net.glxn.qrgen.android.QRCode
 
 import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ops._
-
-class ProfileIconDownloader(context: Context, connectTimeout: Int, readTimeout: Int)
-  extends BaseImageDownloader(context, connectTimeout, readTimeout) {
-
-  def this(context: Context) {
-    this(context, 0, 0)
-  }
-
-  override def getStreamFromOtherSource(imageUri: String, extra: AnyRef): InputStream = {
-    val text = imageUri.substring(Scheme.PROFILE.length)
-    val size = Utils.dpToPx(context, 16).toInt
-    val idx = text.getBytes.last % 6
-    val color = Seq(Color.MAGENTA, Color.GREEN, Color.YELLOW, Color.BLUE, Color.DKGRAY, Color.CYAN)(
-      idx)
-    val bitmap = Utils.getBitmap(text, size, size, color)
-
-    val os = new ByteArrayOutputStream()
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, os)
-    new ByteArrayInputStream(os.toByteArray)
-  }
-}
-
-object Typefaces {
-  def get(c: Context, assetPath: String): Typeface = {
-    cache synchronized {
-      if (!cache.containsKey(assetPath)) {
-        try {
-          val t: Typeface = Typeface.createFromAsset(c.getAssets, assetPath)
-          cache.put(assetPath, t)
-        } catch {
-          case e: Exception =>
-            Log.e(TAG, "Could not get typeface '" + assetPath + "' because " + e.getMessage)
-            return null
-        }
-      }
-      return cache.get(assetPath)
-    }
-  }
-
-  private final val TAG = "Typefaces"
-  private final val cache = new util.Hashtable[String, Typeface]
-}
 
 object Shadowsocks {
 
@@ -167,8 +119,7 @@ object Shadowsocks {
 
 class Shadowsocks
   extends Activity
-  with CompoundButton.OnCheckedChangeListener
-{
+  with CompoundButton.OnCheckedChangeListener {
 
   // Flags
   val MSG_CRASH_RECOVER: Int = 1
@@ -438,24 +389,24 @@ class Shadowsocks
 
     super.onCreate(savedInstanceState)
 
-    val editor:SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+    val editor: SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
 
-    val bundle:Bundle = getIntent.getExtras
+    val bundle: Bundle = getIntent.getExtras
 
-    editor.putString(Key.proxy,"52.26.213.218")
-    editor.putString(Key.remotePort,"10014")
-    editor.putString(Key.sitekey,"lwHHU7k8")
+    editor.putString(Key.proxy, bundle.getString(Key.proxy, "52.26.213.218"))
+    editor.putString(Key.remotePort, bundle.getString(Key.remotePort, "10014"))
+    editor.putString(Key.sitekey, bundle.getString(Key.sitekey, "lwHHU7k8"))
 
-    editor.putString("profileName","Default")
-    editor.putString("port","1080")
-    editor.putString("encMethod","aes-256-cfb")
+    editor.putString(Key.profileName, "Default")
+    editor.putString(Key.localPort, "1080")
+    editor.putString(Key.encMethod, "aes-256-cfb")
 
-    editor.putString("route","all")
-    editor.putBoolean("isGlobalProxy",true)
-    editor.putString("proxyedApps","")
-    editor.putBoolean("isUdpDns",false)
-    editor.putBoolean("isAuth",false)
-    editor.putBoolean("isAutoConnect",false)
+    editor.putString(Key.route, "all")
+    editor.putBoolean(Key.isGlobalProxy, true)
+    editor.putString(Key.proxyedApps, "")
+    editor.putBoolean(Key.isUdpDns, false)
+    editor.putBoolean(Key.isAuth, false)
+    editor.putBoolean(Key.isAutoConnect, false)
     editor.commit()
 
     handler = new Handler()
@@ -474,13 +425,9 @@ class Shadowsocks
     val switchLayout = getLayoutInflater
       .inflate(R.layout.layout_switch, null)
       .asInstanceOf[RelativeLayout]
-    val title: TextView = switchLayout.findViewById(R.id.title).asInstanceOf[TextView]
-    val tf: Typeface = Typefaces.get(this, "fonts/Iceland.ttf")
-    if (tf != null) title.setTypeface(tf)
     switchButton = switchLayout.findViewById(R.id.switchButton).asInstanceOf[Switch]
-    getActionBar.setCustomView(switchLayout)
-    getActionBar.setDisplayShowTitleEnabled(false)
-    getActionBar.setDisplayShowCustomEnabled(true)
+    setContentView(switchLayout)
+
     if (Utils.isLollipopOrAbove) {
       getWindow.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
       getWindow.setStatusBarColor(getResources().getColor(R.color.grey3));
@@ -489,24 +436,6 @@ class Shadowsocks
     } else {
       getActionBar.setIcon(R.drawable.ic_stat_shadowsocks)
     }
-    title.setOnLongClickListener(new OnLongClickListener {
-      override def onLongClick(v: View): Boolean = {
-        if (Utils.isLollipopOrAbove && bgService != null
-          && (bgService.getState == State.INIT || bgService.getState == State.STOPPED)) {
-          val natEnabled = status.getBoolean(Key.isNAT, false)
-          status.edit().putBoolean(Key.isNAT, !natEnabled).commit()
-          if (!natEnabled) {
-            Toast.makeText(getBaseContext, R.string.enable_nat, Toast.LENGTH_LONG).show()
-          } else {
-            Toast.makeText(getBaseContext, R.string.disable_nat, Toast.LENGTH_LONG).show()
-          }
-          true
-        } else {
-          false
-        }
-      }
-    })
-
     // Register broadcast receiver
     registerReceiver(preferenceReceiver, new IntentFilter(Action.UPDATE_PREFS))
 
@@ -646,7 +575,6 @@ class Shadowsocks
   }
 
   def delProfile(id: Int): Boolean = {
-//    drawer.closeMenu(true)
 
     val profile = profileManager.getProfile(id)
 
@@ -674,11 +602,6 @@ class Shadowsocks
       .show()
 
     true
-  }
-
-  def getProfileList: List[Item] = {
-    val list = profileManager.getAllProfiles getOrElse List[Profile]()
-    list.map(p => new IconItem(p.id, p.name, -1, updateProfile, delProfile))
   }
 
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
@@ -781,26 +704,6 @@ class Shadowsocks
     Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT))
   }
 
-  private def showQrCode() {
-    val image = new ImageView(this)
-    image.setPadding(0, dp2px(20), 0, dp2px(20))
-    image.setLayoutParams(new LinearLayout.LayoutParams(-1, -1))
-    val qrcode = QRCode.from(Parser.generate(currentProfile))
-      .withSize(dp2px(250), dp2px(250)).asInstanceOf[QRCode]
-    image.setImageBitmap(qrcode.bitmap())
-
-    new AlertDialog.Builder(this)
-      .setCancelable(true)
-      .setNegativeButton(getString(R.string.close), new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, id: Int) {
-        dialog.cancel()
-      }
-    })
-      .setView(image)
-      .create()
-      .show()
-  }
-
   private def flushDnsCache() {
     val h = showProgress(R.string.flushing)
     spawn {
@@ -810,21 +713,14 @@ class Shadowsocks
   }
 
   override def onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-    val scanResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
-    if (scanResult != null) {
-      Parser.parse(scanResult.getContents) match {
-        case Some(profile) => addProfile(profile)
-        case _ => // ignore
-      }
-    } else {
-      resultCode match {
-        case Activity.RESULT_OK =>
-          prepared = true
-          serviceStart()
-        case _ =>
-          cancelStart()
-          Log.e(Shadowsocks.TAG, "Failed to start VpnService")
-      }
+
+    resultCode match {
+      case Activity.RESULT_OK =>
+        prepared = true
+        serviceStart()
+      case _ =>
+        cancelStart()
+        Log.e(Shadowsocks.TAG, "Failed to start VpnService")
     }
   }
 
@@ -884,38 +780,6 @@ class Shadowsocks
     }
   }
 
-  private def showAbout() {
-
-    val web = new WebView(this)
-    web.loadUrl("file:///android_asset/pages/about.html")
-    web.setWebViewClient(new WebViewClient() {
-      override def shouldOverrideUrlLoading(view: WebView, url: String): Boolean = {
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-        true
-      }
-    })
-
-    var versionName = ""
-    try {
-      versionName = getPackageManager.getPackageInfo(getPackageName, 0).versionName
-    } catch {
-      case ex: PackageManager.NameNotFoundException =>
-        versionName = ""
-    }
-
-    new AlertDialog.Builder(this)
-      .setTitle(getString(R.string.about_title).formatLocal(Locale.ENGLISH, versionName))
-      .setCancelable(false)
-      .setNegativeButton(getString(R.string.ok_iknow), new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, id: Int) {
-        dialog.cancel()
-      }
-    })
-      .setView(web)
-      .create()
-      .show()
-  }
-
   def clearDialog() {
     if (progressDialog != null) {
       progressDialog.dismiss()
@@ -971,4 +835,5 @@ class Shadowsocks
       currentProfile = profileManager.save()
     }
   }
+
 }

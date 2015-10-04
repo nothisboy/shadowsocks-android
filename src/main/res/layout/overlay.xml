@@ -3,4 +3,4 @@
     android:minWidth="80dp" android:maxWidth="80dp" android:gravity="center"
     android:textSize="70sp" android:textColor="#ffffffff"
     android:background="#99000088" android:padding="10dp"
-    android:visibility="invisible"/>
+    android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
