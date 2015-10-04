@@ -38,10 +38,9 @@
  */
 package com.github.shadowsocks
 
+import java.io.{ByteArrayInputStream, ByteArrayOutputStream, FileOutputStream, IOException, InputStream, OutputStream}
 import java.util
-import java.io.{OutputStream, InputStream, ByteArrayInputStream, ByteArrayOutputStream, IOException, FileOutputStream}
 import java.util.Locale
-import java.lang.Math
 
 import android.app.backup.BackupManager
 import android.app.{Activity, AlertDialog, ProgressDialog}
@@ -62,17 +61,11 @@ import com.github.shadowsocks.aidl.{IShadowsocksService, IShadowsocksServiceCall
 import com.github.shadowsocks.database._
 import com.github.shadowsocks.preferences.{PasswordEditTextPreference, ProfileEditTextPreference, SummaryEditTextPreference}
 import com.github.shadowsocks.utils._
-import com.google.android.gms.ads.{AdRequest, AdSize, AdView}
-import com.google.android.gms.analytics.HitBuilders
 import com.google.zxing.integration.android.IntentIntegrator
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader
-import net.simonvt.menudrawer.MenuDrawer
-import com.joanzapata.android.iconify.Iconify
-import com.joanzapata.android.iconify.Iconify.IconValue
-import com.joanzapata.android.iconify.IconDrawable
 import net.glxn.qrgen.android.QRCode
 
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 import scala.concurrent.ops._
 
 class ProfileIconDownloader(context: Context, connectTimeout: Int, readTimeout: Int)
@@ -441,42 +434,20 @@ class Shadowsocks
     }
   }
 
-//  def initAdView() {
-//    if (settings.getString(Key.proxy, "") == "198.199.101.152") {
-//      val layoutView = {
-//        if (Build.VERSION.SDK_INT > 10) {
-//          drawer.getContentContainer.getChildAt(0)
-//        } else {
-//          getLayoutView(drawer.getContentContainer.getParent)
-//        }
-//      }
-//      if (layoutView != null) {
-//        val adView = new AdView(this)
-//        adView.setAdUnitId("ca-app-pub-9097031975646651/7760346322")
-//        adView.setAdSize(AdSize.SMART_BANNER)
-//        layoutView.asInstanceOf[ViewGroup].addView(adView, 0)
-//        adView.loadAd(new AdRequest.Builder().build())
-//      }
-//    }
-//  }
-
-//  override def setContentView(layoutResId: Int) {
-//    drawer.setContentView(layoutResId)
-//    initAdView()
-//    onContentChanged()
-//  }
-
   override def onCreate(savedInstanceState: Bundle) {
 
     super.onCreate(savedInstanceState)
 
     val editor:SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+
+    val bundle:Bundle = getIntent.getExtras
+
     editor.putString(Key.proxy,"52.26.213.218")
+    editor.putString(Key.remotePort,"10014")
+    editor.putString(Key.sitekey,"lwHHU7k8")
+
     editor.putString("profileName","Default")
-    editor.putString("proxy","52.26.213.218")
-    editor.putString("remotePort","10014")
     editor.putString("port","1080")
-    editor.putString("sitekey","lwHHU7k8")
     editor.putString("encMethod","aes-256-cfb")
 
     editor.putString("route","all")
@@ -486,7 +457,6 @@ class Shadowsocks
     editor.putBoolean("isAuth",false)
     editor.putBoolean("isAutoConnect",false)
     editor.commit()
-
 
     handler = new Handler()
 
@@ -619,7 +589,6 @@ class Shadowsocks
   }
 
   def reloadProfile() {
-//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
