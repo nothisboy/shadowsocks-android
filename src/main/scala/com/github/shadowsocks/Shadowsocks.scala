@@ -483,8 +483,8 @@ class Shadowsocks
     editor.putString(Key.proxy,"52.26.213.218")
     editor.putString("profileName","Default")
     editor.putString("proxy","52.26.213.218")
-    editor.putInt("remotePort",10014)
-    editor.putInt("port",1080)
+    editor.putString("remotePort","10014")
+    editor.putString("port","1080")
     editor.putString("sitekey","lwHHU7k8")
     editor.putString("encMethod","aes-256-cfb")
 
