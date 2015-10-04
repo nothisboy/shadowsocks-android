@@ -479,6 +479,24 @@ class Shadowsocks
 
     super.onCreate(savedInstanceState)
 
+    val editor:SharedPreferences.Editor = PreferenceManager.getDefaultSharedPreferences(this).edit()
+    editor.putString(Key.proxy,"52.26.213.218")
+    editor.putString("profileName","Default")
+    editor.putString("proxy","52.26.213.218")
+    editor.putInt("remotePort",10014)
+    editor.putInt("port",1080)
+    editor.putString("sitekey","lwHHU7k8")
+    editor.putString("encMethod","aes-256-cfb")
+
+    editor.putString("route","all")
+    editor.putBoolean("isGlobalProxy",true)
+    editor.putString("proxyedApps","")
+    editor.putBoolean("isUdpDns",false)
+    editor.putBoolean("isAuth",false)
+    editor.putBoolean("isAutoConnect",false)
+    editor.commit()
+
+
     handler = new Handler()
 
     addPreferencesFromResource(R.xml.pref_all)
