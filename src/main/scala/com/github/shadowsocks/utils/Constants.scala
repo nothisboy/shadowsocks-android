@@ -120,3 +120,12 @@ object Route {
   val BYPASS_LAN = "bypass-lan"
   val BYPASS_CHN = "bypass-china"
 }
+
+object Config {
+  val USED: String = "used"
+  val ALL: String = "all"
+  val UNUSED: String = "unused"
+  val PORT: String = "port"
+  val PASSWORD: String = "password"
+}
+

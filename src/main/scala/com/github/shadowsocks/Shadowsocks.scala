@@ -615,28 +615,28 @@ class Shadowsocks
     builder
       .setTitle(R.string.add_profile)
       .setItems(R.array.add_profile_methods, new DialogInterface.OnClickListener() {
-      def onClick(dialog: DialogInterface, which: Int) {
-        which match {
-          case 0 =>
-            dialog.dismiss()
-            val h = showProgress(R.string.loading)
-            h.postDelayed(new Runnable() {
-              def run() {
-                val integrator = new IntentIntegrator(Shadowsocks.this)
-                val list = new java.util.ArrayList(IntentIntegrator.TARGET_ALL_KNOWN)
-                list.add("tw.com.quickmark")
-                integrator.setTargetApplications(list)
-                integrator.initiateScan()
-                h.sendEmptyMessage(0)
-              }
-            }, 600)
-          case 1 =>
-            dialog.dismiss()
-            addProfile(id)
-          case _ =>
+        def onClick(dialog: DialogInterface, which: Int) {
+          which match {
+            case 0 =>
+              dialog.dismiss()
+              val h = showProgress(R.string.loading)
+              h.postDelayed(new Runnable() {
+                def run() {
+                  val integrator = new IntentIntegrator(Shadowsocks.this)
+                  val list = new java.util.ArrayList(IntentIntegrator.TARGET_ALL_KNOWN)
+                  list.add("tw.com.quickmark")
+                  integrator.setTargetApplications(list)
+                  integrator.initiateScan()
+                  h.sendEmptyMessage(0)
+                }
+              }, 600)
+            case 1 =>
+              dialog.dismiss()
+              addProfile(id)
+            case _ =>
+          }
         }
-      }
-    })
+      })
     builder.create().show()
   }
 
@@ -725,23 +725,23 @@ class Shadowsocks
       .setMessage(String.format(Locale.ENGLISH, getString(R.string.remove_profile), profile.get.name))
       .setCancelable(false)
       .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, i: Int) = dialog.cancel()
-    })
+        override def onClick(dialog: DialogInterface, i: Int) = dialog.cancel()
+      })
       .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, i: Int) {
-        profileManager.delProfile(id)
-        val profileId = {
-          val profiles = profileManager.getAllProfiles.getOrElse(List[Profile]())
-          if (profiles.isEmpty) -1 else profiles(0).id
+        override def onClick(dialog: DialogInterface, i: Int) {
+          profileManager.delProfile(id)
+          val profileId = {
+            val profiles = profileManager.getAllProfiles.getOrElse(List[Profile]())
+            if (profiles.isEmpty) -1 else profiles(0).id
+          }
+          currentProfile = profileManager.load(profileId)
+          menuAdapter.updateList(getMenuList, currentProfile.id)
+
+          updatePreferenceScreen()
+
+          dialog.dismiss()
         }
-        currentProfile = profileManager.load(profileId)
-        menuAdapter.updateList(getMenuList, currentProfile.id)
-
-        updatePreferenceScreen()
-
-        dialog.dismiss()
-      }
-    })
+      })
       .create()
       .show()
 
@@ -768,7 +768,7 @@ class Shadowsocks
     buf += new Category(getString(R.string.settings))
 
     buf += new DrawableItem(-100, getString(R.string.recovery), new IconDrawable(this, IconValue.fa_recycle)
-        .colorRes(android.R.color.darker_gray).sizeDp(26), _ => {
+      .colorRes(android.R.color.darker_gray).sizeDp(26), _ => {
       // send event
       application.tracker.send(new HitBuilders.EventBuilder()
         .setCategory(Shadowsocks.TAG)
@@ -803,7 +803,7 @@ class Shadowsocks
       })
 
     buf += new DrawableItem(-400, getString(R.string.about), new IconDrawable(this, IconValue.fa_info_circle)
-        .colorRes(android.R.color.darker_gray).sizeDp(26), _ => {
+      .colorRes(android.R.color.darker_gray).sizeDp(26), _ => {
       // send event
       application.tracker.send(new HitBuilders.EventBuilder()
         .setCategory(Shadowsocks.TAG)
@@ -960,10 +960,10 @@ class Shadowsocks
     new AlertDialog.Builder(this)
       .setCancelable(true)
       .setNegativeButton(getString(R.string.close), new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, id: Int) {
-        dialog.cancel()
-      }
-    })
+        override def onClick(dialog: DialogInterface, id: Int) {
+          dialog.cancel()
+        }
+      })
       .setView(image)
       .create()
       .show()
@@ -1075,10 +1075,10 @@ class Shadowsocks
       .setTitle(getString(R.string.about_title).formatLocal(Locale.ENGLISH, versionName))
       .setCancelable(false)
       .setNegativeButton(getString(R.string.ok_iknow), new DialogInterface.OnClickListener() {
-      override def onClick(dialog: DialogInterface, id: Int) {
-        dialog.cancel()
-      }
-    })
+        override def onClick(dialog: DialogInterface, id: Int) {
+          dialog.cancel()
+        }
+      })
       .setView(web)
       .create()
       .show()
