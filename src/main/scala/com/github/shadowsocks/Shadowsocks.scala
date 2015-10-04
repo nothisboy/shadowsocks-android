@@ -211,10 +211,8 @@ class Shadowsocks
       // Update the UI
       if (switchButton != null) switchButton.setEnabled(true)
       if (State.isAvailable(bgService.getState)) {
-        //setPreferenceEnabled(enabled = true)
       } else {
         changeSwitch(checked = true)
-        //setPreferenceEnabled(enabled = false)
       }
       state = bgService.getState
       // set the listener
@@ -222,7 +220,7 @@ class Shadowsocks
 
       if (!status.getBoolean(getVersionName, false)) {
         status.edit.putBoolean(getVersionName, true).commit()
-        recovery()
+        recovery();
       }
     }
 
@@ -443,6 +441,31 @@ class Shadowsocks
     }
   }
 
+//  def initAdView() {
+//    if (settings.getString(Key.proxy, "") == "198.199.101.152") {
+//      val layoutView = {
+//        if (Build.VERSION.SDK_INT > 10) {
+//          drawer.getContentContainer.getChildAt(0)
+//        } else {
+//          getLayoutView(drawer.getContentContainer.getParent)
+//        }
+//      }
+//      if (layoutView != null) {
+//        val adView = new AdView(this)
+//        adView.setAdUnitId("ca-app-pub-9097031975646651/7760346322")
+//        adView.setAdSize(AdSize.SMART_BANNER)
+//        layoutView.asInstanceOf[ViewGroup].addView(adView, 0)
+//        adView.loadAd(new AdRequest.Builder().build())
+//      }
+//    }
+//  }
+
+//  override def setContentView(layoutResId: Int) {
+//    drawer.setContentView(layoutResId)
+//    initAdView()
+//    onContentChanged()
+//  }
+
   override def onCreate(savedInstanceState: Bundle) {
 
     super.onCreate(savedInstanceState)
@@ -606,15 +629,12 @@ class Shadowsocks
           profileManager.getProfile(settings.getInt(Key.profileId, -1)) getOrElse currentProfile
         }
 
-        //updatePreferenceScreen()
-
         h.sendEmptyMessage(0)
       }
     }, 600)
   }
 
   def addProfile(profile: Profile) {
-//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -624,15 +644,12 @@ class Shadowsocks
         profileManager.createOrUpdateProfile(currentProfile)
         profileManager.reload(currentProfile.id)
 
-        //updatePreferenceScreen()
-
         h.sendEmptyMessage(0)
       }
     }, 600)
   }
 
   def addProfile(id: Int) {
-//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
@@ -641,23 +658,18 @@ class Shadowsocks
         currentProfile = profileManager.reload(id)
         profileManager.save()
 
-        //updatePreferenceScreen()
-
         h.sendEmptyMessage(0)
       }
     }, 600)
   }
 
   def updateProfile(id: Int) {
-//    drawer.closeMenu(true)
 
     val h = showProgress(R.string.loading)
 
     handler.postDelayed(new Runnable {
       def run() {
         currentProfile = profileManager.reload(id)
-
-        //updatePreferenceScreen()
 
         h.sendEmptyMessage(0)
       }
@@ -686,8 +698,6 @@ class Shadowsocks
         }
         currentProfile = profileManager.load(profileId)
 
-        //updatePreferenceScreen()
-
         dialog.dismiss()
       }
     })
@@ -705,7 +715,6 @@ class Shadowsocks
   override def onOptionsItemSelected(item: MenuItem): Boolean = {
     item.getItemId match {
       case android.R.id.home =>
-//        drawer.toggleMenu()
         return true
     }
     super.onOptionsItemSelected(item)
@@ -958,13 +967,11 @@ class Shadowsocks
                   .show(Shadowsocks.this, "", getString(R.string.connecting), true, true)
                 progressTag = R.string.connecting
               }
-              //setPreferenceEnabled(enabled = false)
             case State.CONNECTED =>
               if (progressTag == R.string.connecting) {
                 clearDialog()
               }
               changeSwitch(checked = true)
-              //setPreferenceEnabled(enabled = false)
             case State.STOPPED =>
               if (progressTag == R.string.stopping || progressTag == R.string.connecting) {
                 clearDialog()
@@ -978,7 +985,6 @@ class Shadowsocks
                   .withDuration(SnackBar.LONG_SNACK)
                   .show()
               }
-              //setPreferenceEnabled(enabled = true)
             case State.STOPPING =>
               if (progressDialog == null) {
                 progressDialog = ProgressDialog
